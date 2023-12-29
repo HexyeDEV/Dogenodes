@@ -95,6 +95,9 @@ def update_all_data():
         else:
             ip = peer["addr"].split(":")[0]
             port = peer["addr"].split(":")[1]
+        for relay in RELAY_NODES:
+            if ip in relay[0]:
+                continue
         if get_peer_from_db(ip, port) is None:
             c = conn.cursor()
             c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (ip, port, 1, timestamp, timestamp, timestamp, version, sub_version, 0))
@@ -123,7 +126,7 @@ def update_all_data():
         version, sub_version = get_relay_version(relay)
         if is_relay_online(relay):
             actual_port = relay[3]
-            if get_peer_from_db(ip, port) is None:
+            if get_peer_from_db(ip, actual_port) is None:
                 c = conn.cursor()
                 c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (ip, actual_port, 1, timestamp, timestamp, timestamp, version, sub_version, 1))
                 conn.commit()
