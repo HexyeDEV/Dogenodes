@@ -84,10 +84,11 @@ def node(id):
         average_365d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/365/day").json()["percentage"]
     return render_template("node.html", node=peer["peer"], node_uptime=peer["uptime"], history=peer_history[0], average_1h=average_1h, average_24h=average_24h, average_7d=average_7d, average_30d=average_30d, average_365d=average_365d)
 
-@app.route("/nodes/<ip>/<port>")
-def node_by_ip(ip, port):
+@app.route("/nodes/<host>")
+def node_by_ip(host):
+    ip, port = host.split(":")
     peer = requests.get(f"{API_URL}/peer/get/{ip}/{port}").json()
-    node_id = peer["peer"]["id"]
+    node_id = peer["id"]
     return redirect(url_for("node", id=node_id))
 
 if __name__ == "__main__":
