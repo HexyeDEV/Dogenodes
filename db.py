@@ -1,10 +1,15 @@
-import sqlite3
+import mysql.connector
 
 def create_db():
-    conn = sqlite3.connect("db.db")
+    conn = mysql.connector.connect(
+        host='localhost',
+        user='yourusername',
+        password='yourpassword',
+        database='yourdatabase'
+    )
     c = conn.cursor()
     c.execute("""CREATE TABLE IF NOT EXISTS peers
-        (id INTEGER PRIMARY KEY AUTOINCREMENT,
+        (id INT AUTO_INCREMENT PRIMARY KEY,
         ip TEXT,
         port INTEGER,
         online INTEGER DEFAULT 0,
@@ -19,7 +24,7 @@ def create_db():
         peer_id INTEGER,
         online INTEGER,
         timestamp INTEGER,
-        FOREIGN KEY (peer_id) REFERENCES peers(id));""")
+        FOREIGN KEY (peer_id) REFERENCES peers(id)) ENGINE=InnoDB;""")
     c.execute("""CREATE TABLE IF NOT EXISTS versions_history
         (id INTEGER PRIMARY KEY AUTOINCREMENT,
         version TEXT,
