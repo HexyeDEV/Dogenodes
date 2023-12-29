@@ -44,6 +44,8 @@ def is_valid(peer):
         return False
     if peer["synced_headers"] < peer["synced_blocks"]:
         return False
+    if peer["version"] < 70000:
+        return False
     return True
 
 def get_peer_from_db(ip, port):
