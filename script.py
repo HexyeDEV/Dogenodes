@@ -2,7 +2,6 @@ import requests, json
 import sqlite3
 import time
 from db import create_db
-import matplotlib.pyplot as plt
 
 create_db()
 
