@@ -68,7 +68,7 @@
         type: 'bar',
         data: {
             labels: [
-                {% for data in history|reverse %}
+                {% for data in history %}
                 '{{ data.timestamp|date }}',
                 {% endfor %}
             ],

@@ -107,7 +107,7 @@ async def get_peer_history(peer_id: int, page: int = Query(0, alias="page")):
     Args:
         peer_id (int): The id of the peer.
         page (int): The page number."""
-    async with app.db_connection.execute("SELECT * FROM peer_history WHERE peer_id=? ORDER BY timestamp DESC LIMIT 50 OFFSET ?", (peer_id, page * 50)) as cursor:
+    async with app.db_connection.execute("SELECT * FROM peer_history WHERE peer_id=? ORDER BY timestamp ASC LIMIT 50 OFFSET ?", (peer_id, page * 50)) as cursor:
         total_pages = await app.db_connection.execute("SELECT COUNT(*) FROM peer_history WHERE peer_id=?", (peer_id,))
         total_pages = await total_pages.fetchone()
         total_pages = total_pages[0] / 50
