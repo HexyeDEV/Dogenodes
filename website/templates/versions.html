@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<h2 class="text-center">VERSIONS</h2>
+{% for version in versions %}
+<div class="answer-question">
+    <div class="question">
+        <h3>{{ version }}: {{ versions[version] }}</h3>
+    </div>
+</div>
+{% endfor %}
+<br>
+<h2 class="text-center">SUB VERSIONS</h2>
+{% for sub_version in sub_versions %}
+<div class="answer-question">
+    <div class="question">
+        <h3>{{ sub_version }}: {{ sub_versions[sub_version] }}</h3>
+    </div>
+</div>
+{% endfor %}
+<br>
+
+<a href="/" class="btn btn-primary">Home</a>
+
+
+
+{% endblock %}

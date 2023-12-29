@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="answer-question">
+        <div class="question">
+            <h3>What is dogenodes?</h3>
+        </div>
+        <div class="answer">
+            <p>
+                Dogenodes is a website that displays reachable dogecoin nodes. It takes inspiration from <a href="https://bitnodes.io/">bitnodes.io</a> and <a href="https://monerohash.com/nodes-distribution.html">monerohash.com</a>.<br>You can check the source code at https://github.com/HexyeDEV/Dogenodes
+            </p>
+        </div>
+    </div>
+    <br>
+    <div class="answer-question">
+        <div class="question">
+            <h3>How does it work?</h3>
+        </div>
+        <div class="answer">
+            <p>
+                Dogenodes checks all the peers connected to the node: 159.69.195.99:22556.<br>I am planning however on adding more nodes to check from.
+            </p>
+        </div>
+    </div>
+    <br>
+    <div class="answer-question">
+        <div class="question">
+            <h3>Online Nodes now: {{ online_nodes }}</h3>
+        </div>
+    </div>
+    <br><br>
+    <!-- buttons going to the different pages -->
+    <div class="text-center">
+        <a href="/nodes" class="btn btn-primary">Nodes</a>
+        <a href="/versions" class="btn btn-primary">Versions Distribution</a>
+    </div>
+{% endblock %}
