@@ -86,6 +86,9 @@ def update_all_data():
     timestamp = int(time.time())
     for peer in peers:
         if not is_valid(peer):
+            c = conn.cursor()
+            c.execute("UPDATE peers SET online=?, last_check=? WHERE ip=? AND port=?", (0, timestamp, peer["addr"].split(":")[0], peer["addr"].split(":")[1]))
+            conn.commit()
             update_peer_history(get_peer_from_db(peer["addr"].split(":")[0], peer["addr"].split(":")[1]), 0, timestamp)
             continue
         version = peer["version"]
