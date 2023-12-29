@@ -130,7 +130,7 @@ def update_all_data():
                 c = conn.cursor()
                 c.execute("UPDATE peers SET online=?, last_seen=?, last_check=?, version=?, sub_version=? WHERE ip=? AND port=?", (1, timestamp, timestamp, version, sub_version, ip, actual_port))
                 conn.commit()
-            update_peer_history(get_peer_from_db(ip, port), 1, timestamp)
+            update_peer_history(get_peer_from_db(ip, actual_port), 1, timestamp)
             update_versions_history(version, sub_version, timestamp)
         else:
             c = conn.cursor()
