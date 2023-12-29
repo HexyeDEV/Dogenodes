@@ -86,7 +86,7 @@ def node(id):
 
 @app.route("/nodes/<host>")
 def node_by_ip(host):
-    ip, port = host.split(":")
+    ip, port = host.split("-")
     peer = requests.get(f"{API_URL}/peer/get/{ip}/{port}").json()
     node_id = peer["id"]
     return redirect(url_for("node", id=node_id))
