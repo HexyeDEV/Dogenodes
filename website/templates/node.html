@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<!-- node info -->
+<div class="answer-question">
+
+    <div class="question">
+
+        <h3>Node Info</h3>
+
+    </div>
+
+    <div class="answer">
+
+        <p>
+            ID: {{ node.id }}
+            <br>
+            IP: {{ node.ip }}
+            <br>
+            Port: {{ node.port }}
+            <br>
+            Online: {% if node.online %}Yes{% else %}No{% endif %}
+            <br>
+            Uptime: {% if node.online %}{{ node_uptime|uptime }}{% else %}N/A{% endif %}
+            <br>
+            Last Seen: {{ node.last_seen|date}}
+            <br>
+            Version: {{ node.version }}
+            <br>
+            Sub Version: {{ node.sub_version }}
+            <br>
+            Average Uptime (1h): {{ average_1h|round(2) }}%
+            <br>
+            Average Uptime (24h): {{ average_24h|round(2) }}%
+            <br>
+            Average Uptime (7d): {{ average_7d|round(2) }}%
+            <br>
+            Average Uptime (30d): {{ average_30d|round(2) }}%
+            <br>
+            Average Uptime (365d): {{ average_365d|round(2) }}%
+        </p>
+
+    </div>
+</div>
+
+<!-- graph with uptime -->
+<br>
+<br>
+<h2 class="text-center">UPTIME CHART</h2>
+<canvas id="uptimeChart"></canvas>
+
+<!-- make the uptime graph. History data is in history variable. For each iteration we have online (1 or 0) and the timestamp. -->
+<script>
+    var ctx = document.getElementById('uptimeChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for data in history|reverse %}
+                '{{ data.timestamp|date }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Uptime',
+                data: [
+                    {% for data in history %}
+                    {% if data.online %}
+                    1,
+                    {% else %}
+                    0,
+                    {% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(0, 255, 0, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(0, 255, 0, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    ticks: {
+                        // Include a dollar sign in the ticks
+                        callback: function(value, index, values) {
+                            return value == 1 ? 'Online' : 'Offline';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+<br>
+<br>
+
+<a href="/" class="btn btn-primary">Home</a>
+
+
+
+{% endblock %}
