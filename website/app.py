@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import requests, time
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = "http://45.134.222.45:8000"
 
 app = Flask(__name__)
 
@@ -72,12 +72,17 @@ def nodes():
 def node(id):
     peer = requests.get(f"{API_URL}/peer/get/{id}/").json()
     peer_history = requests.get(f"{API_URL}/peer/{id}/history?page=0").json()
-    average_1h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/1/hour").json()
-    average_24h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/24/hour").json()
-    average_7d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/7/day").json()
-    average_30d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/30/day").json()
-    average_365d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/365/day").json()
-    return render_template("node.html", node=peer["peer"], node_uptime=peer["uptime"], history=peer_history[0], average_1h=average_1h["percentage"], average_24h=average_24h["percentage"], average_7d=average_7d["percentage"], average_30d=average_30d["percentage"], average_365d=average_365d["percentage"])
+    average_24h, average_7d, average_30d, average_365d = None
+    average_1h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/1/hour").json()["percentage"]
+    if peer["uptime"] > 3600:
+        average_24h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/24/hour").json()["percentage"]
+    if peer["uptime"] > 86400:
+        average_7d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/7/day").json()["percentage"]
+    if peer["uptime"] > 2592000:
+        average_30d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/30/day").json()["percentage"]
+    if peer["uptime"] > 31536000:
+        average_365d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/365/day").json()["percentage"]
+    return render_template("node.html", node=peer["peer"], node_uptime=peer["uptime"], history=peer_history[0], average_1h=average_1h, average_24h=average_24h, average_7d=average_7d, average_30d=average_30d, average_365d=average_365d)
 
 @app.route("/nodes/<ip>:<port>")
 def node_by_ip(ip, port):
@@ -86,4 +91,5 @@ def node_by_ip(ip, port):
     return redirect(url_for("node", id=node_id))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    ssl_context = ('cert.pem', 'key.pem')
+    app.run(debug=True, ssl_context=ssl_context, port=443, host="0.0.0.0")
