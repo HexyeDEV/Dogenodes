@@ -106,7 +106,7 @@ def update_all_data():
         update_peer_history(get_peer_from_db(ip, port), 1, timestamp)
         update_versions_history(version, sub_version, timestamp)
     c = conn.cursor()
-    c.execute("SELECT * FROM peers WHERE last_check < ? AND online=? AND is_relay=?", (timestamp - 60, 1, 0))
+    c.execute("SELECT * FROM peers WHERE last_check < ? AND online=? AND is_relay=?", (timestamp - 10, 1, 0))
     peers = c.fetchall()
     for peer in peers:
         c = conn.cursor()
