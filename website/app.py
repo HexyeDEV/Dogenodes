@@ -66,7 +66,7 @@ def nodes():
     if page != 0:
         page = int(page) - 1
     peers = requests.get(f"{API_URL}/peers?page={page}").json()
-    return render_template("nodes.html", nodes=peers[0], total_pages=peers[1]["pages"], current_page=page + 1)
+    return render_template("nodes.html", nodes=peers[0], total_pages=peers[1]["pages"] + 1, current_page=page + 1)
 
 @app.route("/nodes/<id>")
 def node(id):
