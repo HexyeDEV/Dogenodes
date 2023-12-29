@@ -72,7 +72,7 @@ def nodes():
 def node(id):
     peer = requests.get(f"{API_URL}/peer/get/{id}/").json()
     peer_history = requests.get(f"{API_URL}/peer/{id}/history?page=0").json()
-    average_24h, average_7d, average_30d, average_365d = None
+    average_24h, average_7d, average_30d, average_365d = None, None, None, None
     average_1h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/1/hour").json()["percentage"]
     if peer["uptime"] > 3600:
         average_24h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/24/hour").json()["percentage"]
@@ -92,4 +92,4 @@ def node_by_ip(ip, port):
 
 if __name__ == "__main__":
     ssl_context = ('cert.pem', 'key.pem')
-    app.run(debug=True, ssl_context=ssl_context, port=443, host="0.0.0.0")
+    app.run(ssl_context=ssl_context, port=443, host="0.0.0.0")
