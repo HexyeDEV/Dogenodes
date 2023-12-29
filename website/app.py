@@ -70,6 +70,7 @@ def nodes():
 
 @app.route("/nodes/<id>")
 def node(id):
+    print(id)
     peer = requests.get(f"{API_URL}/peer/get/{id}/").json()
     peer_history = requests.get(f"{API_URL}/peer/{id}/history?page=0").json()
     average_24h, average_7d, average_30d, average_365d = None, None, None, None
