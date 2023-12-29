@@ -76,11 +76,7 @@
                 label: 'Uptime',
                 data: [
                     {% for data in history %}
-                    {% if data.online %}
-                    1,
-                    {% else %}
-                    0,
-                    {% endif %}
+                    {{ data.online }},
                     {% endfor %}
                 ],
                 backgroundColor: [
