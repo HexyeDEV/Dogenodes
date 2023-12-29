@@ -35,13 +35,21 @@
             <br>
             Average Uptime (1h): {{ average_1h|round(2) }}%
             <br>
+            {% if average_24h %}
             Average Uptime (24h): {{ average_24h|round(2) }}%
             <br>
+            {% endif %}
+            {% if average_7d %}
             Average Uptime (7d): {{ average_7d|round(2) }}%
             <br>
+            {% endif %}
+            {% if average_30d %}
             Average Uptime (30d): {{ average_30d|round(2) }}%
             <br>
+            {% endif %}
+            {% if average_365d %}
             Average Uptime (365d): {{ average_365d|round(2) }}%
+            {% endif %}
         </p>
 
     </div>
