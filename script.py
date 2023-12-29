@@ -44,6 +44,10 @@ def is_valid(peer):
         return False
     if peer["synced_headers"] < peer["synced_blocks"]:
         return False
+    try:
+        peer["version"] = int(peer["version"])
+    except:
+        return False
     if peer["version"] < 70000:
         return False
     return True
@@ -62,16 +66,6 @@ def update_versions_history(version, sub_version, timestamp):
     c = conn.cursor()
     c.execute("INSERT INTO versions_history (version, sub_version, timestamp) VALUES (?, ?, ?)", (version, sub_version, timestamp))
     conn.commit()
-
-
-def update_versions_data():
-    peers = get_peers()
-    for peer in peers:
-        if not is_valid(peer):
-            continue
-        version = peer["version"]
-        sub_version = peer["subver"]
-        c = conn.cursor()
 
 def get_relay_version(relay):
     try:
