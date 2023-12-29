@@ -1,16 +1,17 @@
 from fastapi import FastAPI, Query
-import aiosqlite
+import aiomysql
 import uvicorn, time
 
 app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
-    app.db_connection = await aiosqlite.connect("db.db")
+    app.db_pool = await aiomysql.create_pool(host='localhost', port=3306, user='your_user', password='your_password', db='your_db')
 
 @app.on_event("shutdown")
 async def shutdown():
-    await app.db_connection.close()
+    await app.db_pool.close()
+    await app.db_pool.wait_closed()
 
 def jsonify_peer(peer):
     return {
