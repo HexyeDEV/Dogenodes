@@ -82,14 +82,10 @@ def node(id):
     peer_history = requests.get(f"{API_URL}/peer/{id}/history?page=0").json()
     average_24h, average_7d, average_30d, average_365d = None, None, None, None
     average_1h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/1/hour").json()["percentage"]
-    if peer["uptime"] > 3600:
-        average_24h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/24/hour").json()["percentage"]
-    if peer["uptime"] > 86400:
-        average_7d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/7/day").json()["percentage"]
-    if peer["uptime"] > 2592000:
-        average_30d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/30/day").json()["percentage"]
-    if peer["uptime"] > 31536000:
-        average_365d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/365/day").json()["percentage"]
+    average_24h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/24/hour").json()["percentage"]
+    average_7d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/7/day").json()["percentage"]
+    average_30d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/30/day").json()["percentage"]
+    average_365d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/365/day").json()["percentage"]
     return render_template("node.html", node=peer["peer"], node_uptime=peer["uptime"], history=peer_history[0], average_1h=average_1h, average_24h=average_24h, average_7d=average_7d, average_30d=average_30d, average_365d=average_365d)
 
 @app.route("/nodes/ip/<host>")
