@@ -50,6 +50,8 @@ def versions():
     sub_versions = {}
     for page in peers:
         for peer in page:
+            if peer["version"] < 70000:
+                continue
             if peer["version"] not in versions:
                 versions[peer["version"]] = 1
             else:
