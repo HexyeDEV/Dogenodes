@@ -1,16 +1,17 @@
 from fastapi import FastAPI, Query
-import aiosqlite
+import aiomysql
 import uvicorn, time
 
 app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
-    app.db_connection = await aiosqlite.connect("db.db")
+    app.db_connection = await aiomysql.create_pool(host='localhost', port=3306, user='yourusername', password='yourpassword', db='yourdatabase')
 
 @app.on_event("shutdown")
 async def shutdown():
-    await app.db_connection.close()
+    app.db_connection.close()
+    await app.db_connection.wait_closed()
 
 def jsonify_peer(peer):
     return {
@@ -52,7 +53,7 @@ def jsonify_versions_history(versions_history, pages):
     }, {"pages": int(pages)}
 
 async def get_uptime(peer_id):
-    async with app.db_connection.execute("SELECT * FROM peers WHERE id=?", (peer_id,)) as cursor:
+    async with app.db_connection.execute("SELECT * FROM peers WHERE id=%s", (peer_id,)) as cursor:
         session_start = await cursor.fetchone()
         if session_start is None:
             return 0
@@ -68,7 +69,7 @@ async def get_peers(page: int = Query(0, alias="page")):
 
     Args:
         page (int): The page number."""
-    async with app.db_connection.execute("SELECT * FROM peers ORDER BY online DESC, last_seen DESC LIMIT 50 OFFSET ?", (page * 50,)) as cursor:
+    async with app.db_connection.execute("SELECT * FROM peers ORDER BY online DESC, last_seen DESC LIMIT 50 OFFSET %s", (page * 50,)) as cursor:
         total_pages = await app.db_connection.execute("SELECT COUNT(*) FROM peers")
         total_pages = await total_pages.fetchone()
         total_pages = total_pages[0] / 50
@@ -82,7 +83,7 @@ async def get_peer(ip: str, port: int):
     Args:
         ip (str): The ip address of the peer.
         port (int): The port of the peer."""
-    async with app.db_connection.execute("SELECT * FROM peers WHERE ip=? AND port=?", (ip, port)) as cursor:
+    async with app.db_connection.execute("SELECT * FROM peers WHERE ip=%s AND port=%s", (ip, port)) as cursor:
         return jsonify_peer(await cursor.fetchone())
     
 @app.get("/peer/get/{peer_id}")
@@ -91,7 +92,7 @@ async def get_peer_by_id(peer_id: int):
 
     Args:
         peer_id (int): The id of the peer."""
-    async with app.db_connection.execute("SELECT * FROM peers WHERE id=?", (peer_id,)) as cursor:
+    async with app.db_connection.execute("SELECT * FROM peers WHERE id=%s", (peer_id,)) as cursor:
         peer = await cursor.fetchone()
         if peer is None:
             return {"error": "Peer not found."}
@@ -107,8 +108,8 @@ async def get_peer_history(peer_id: int, page: int = Query(0, alias="page")):
     Args:
         peer_id (int): The id of the peer.
         page (int): The page number."""
-    async with app.db_connection.execute("SELECT * FROM peer_history WHERE peer_id=? ORDER BY timestamp ASC LIMIT 50 OFFSET ?", (peer_id, page * 50)) as cursor:
-        total_pages = await app.db_connection.execute("SELECT COUNT(*) FROM peer_history WHERE peer_id=?", (peer_id,))
+    async with app.db_connection.execute("SELECT * FROM peer_history WHERE peer_id=%s ORDER BY timestamp ASC LIMIT 50 OFFSET %s", (peer_id, page * 50)) as cursor:
+        total_pages = await app.db_connection.execute("SELECT COUNT(*) FROM peer_history WHERE peer_id=%s", (peer_id,))
         total_pages = await total_pages.fetchone()
         total_pages = total_pages[0] / 50
         return jsonify_peer_history(await cursor.fetchall(), total_pages)
@@ -129,7 +130,7 @@ async def get_versions_history(page: int = Query(0, alias="page")):
 
     Args:
         page (int): The page number."""
-    async with app.db_connection.execute("SELECT * FROM versions_history LIMIT 50 OFFSET ?", (page * 50,)) as cursor:
+    async with app.db_connection.execute("SELECT * FROM versions_history LIMIT 50 OFFSET %s", (page * 50,)) as cursor:
         total_pages = await app.db_connection.execute("SELECT COUNT(*) FROM versions_history")
         total_pages = await total_pages.fetchone()
         total_pages = total_pages[0] / 50
@@ -138,7 +139,7 @@ async def get_versions_history(page: int = Query(0, alias="page")):
 @app.get("/nodes/online")
 async def get_nodes_online():
     """Get the number of nodes online."""
-    async with app.db_connection.execute("SELECT COUNT(*) FROM peers WHERE online=?", (1,)) as cursor:
+    async with app.db_connection.execute("SELECT COUNT(*) FROM peers WHERE online=%s", (1,)) as cursor:
         count = await cursor.fetchone()
         return {"count": count[0]}
     
@@ -162,9 +163,9 @@ async def get_peer_uptime_percentage(peer_id: int, amount: int, period_unit: str
         period = 31556926
     else:
         return {"error": "Invalid period unit."}
-    async with app.db_connection.execute("SELECT COUNT(*) FROM peer_history WHERE peer_id=? AND online=1 AND timestamp > ?", (peer_id, int(time.time()) - amount * period)) as cursor:
+    async with app.db_connection.execute("SELECT COUNT(*) FROM peer_history WHERE peer_id=%s AND online=1 AND timestamp > %s", (peer_id, int(time.time()) - amount * period)) as cursor:
         count_online = await cursor.fetchone()
-        async with app.db_connection.execute("SELECT COUNT(*) FROM peer_history WHERE peer_id=? AND timestamp > ?", (peer_id, int(time.time()) - amount * period)) as cursor:
+        async with app.db_connection.execute("SELECT COUNT(*) FROM peer_history WHERE peer_id=%s AND timestamp > %s", (peer_id, int(time.time()) - amount * period)) as cursor:
             count_total = await cursor.fetchone()
             return {"percentage": count_online[0] / count_total[0] * 100}
 
