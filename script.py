@@ -9,7 +9,7 @@ conn = sqlite3.connect("db.db")
 
 
 RELAY_NODES = [
-    ("ip:port", "username", "password")
+    ("ip:post", "username", "password", "actual_port"),
 ]
 
 def get_peers():
@@ -97,7 +97,7 @@ def update_all_data():
             port = peer["addr"].split(":")[1]
         if get_peer_from_db(ip, port) is None:
             c = conn.cursor()
-            c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (ip, port, 1, timestamp, timestamp, timestamp, version, sub_version, 1))
+            c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (ip, port, 1, timestamp, timestamp, timestamp, version, sub_version, 0))
             conn.commit()
         else:
             c = conn.cursor()
@@ -121,13 +121,14 @@ def update_all_data():
             port = relay[0].split(":")[1]
         version, sub_version = get_relay_version(relay)
         if is_relay_online(relay):
+            actual_port = relay[3]
             if get_peer_from_db(ip, port) is None:
                 c = conn.cursor()
-                c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (ip, port, 1, timestamp, timestamp, timestamp, version, sub_version))
+                c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (ip, actual_port, 1, timestamp, timestamp, timestamp, version, sub_version, 1))
                 conn.commit()
             else:
                 c = conn.cursor()
-                c.execute("UPDATE peers SET online=?, last_seen=?, last_check=?, version=?, sub_version=? WHERE ip=? AND port=?", (1, timestamp, timestamp, version, sub_version, ip, port))
+                c.execute("UPDATE peers SET online=?, last_seen=?, last_check=?, version=?, sub_version=? WHERE ip=? AND port=?", (1, timestamp, timestamp, version, sub_version, ip, actual_port))
                 conn.commit()
             update_peer_history(get_peer_from_db(ip, port), 1, timestamp)
             update_versions_history(version, sub_version, timestamp)
