@@ -110,7 +110,8 @@ def update_all_data():
     peers = c.fetchall()
     for peer in peers:
         c = conn.cursor()
-        c.execute("UPDATE peers SET online=?, last_check=?, session_start=?, last_seen=?, WHERE ip=? AND port=?", (0, timestamp, 0, timestamp, peer[1], peer[2]))
+        c.execute("UPDATE peers SET online=?, last_check=?, session_start=?, last_seen=? WHERE ip=? AND port=?", (0, timestamp, 0, timestamp, peer[1], peer[2]))
+        conn.commit()
         update_peer_history(peer, 0, timestamp)
     for relay in RELAY_NODES:
         if relay[0].startswith("["):
