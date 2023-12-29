@@ -50,6 +50,10 @@ def versions():
     sub_versions = {}
     for page in peers:
         for peer in page:
+            try:
+                peer["version"] = int(peer["version"])
+            except:
+                continue
             if peer["version"] < 70000:
                 continue
             if peer["version"] not in versions:
@@ -61,6 +65,7 @@ def versions():
             else:
                 sub_versions[peer["sub_version"]] += 1
     return render_template("versions.html", versions=versions, sub_versions=sub_versions)
+
 
 @app.route("/nodes")
 def nodes():
