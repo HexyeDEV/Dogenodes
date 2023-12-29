@@ -86,6 +86,7 @@ def update_all_data():
     timestamp = int(time.time())
     for peer in peers:
         if not is_valid(peer):
+            update_peer_history(get_peer_from_db(peer["addr"].split(":")[0], peer["addr"].split(":")[1]), 0, timestamp)
             continue
         version = peer["version"]
         sub_version = peer["subver"]
