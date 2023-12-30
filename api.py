@@ -1,12 +1,16 @@
 from fastapi import FastAPI, Query
 import aiomysql
 import uvicorn, time
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
-    app.db_connection = await aiomysql.create_pool(host='localhost', port=3306, user='yourusername', password='yourpassword', db='yourdatabase')
+    app.db_connection = await aiomysql.create_pool(host=os.getenv("DB_HOST"), port=int(os.getenv("DB_PORT")), user=os.getenv("DB_USER"), password=os.getenv("DB_PASSWORD"), db=os.getenv("DB_NAME"), autocommit=True)
 
 @app.on_event("shutdown")
 async def shutdown():

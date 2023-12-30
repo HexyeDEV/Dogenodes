@@ -1,11 +1,15 @@
 import mysql.connector
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 def create_db():
     conn = mysql.connector.connect(
-        host='localhost',
-        user='yourusername',
-        password='yourpassword',
-        database='yourdatabase'
+        host=os.getenv('DB_HOST'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASS'),
+        database=os.getenv('DB_NAME')
     )
     c = conn.cursor()
     c.execute("""CREATE TABLE IF NOT EXISTS peers

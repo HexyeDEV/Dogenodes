@@ -2,14 +2,18 @@ import requests, json
 import mysql.connector
 import time
 from db import create_db
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 create_db()
 
 conn = mysql.connector.connect(
-    host="localhost",
-    user="yourusername",
-    password="yourpassword",
-    database="yourdatabase"
+    host=os.getenv('DB_HOST'),
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASS'),
+    database=os.getenv('DB_NAME')
 )
 
 
