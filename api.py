@@ -77,7 +77,7 @@ async def get_peers(page: int = Query(0, alias="page")):
         page (int): The page number."""
     async with app.db_connection.acquire() as conn:
         async with conn.cursor() as cursor:
-            await cursor.execute("SELECT * FROM peers ORDER BY session_start ASC, last_seen DESC LIMIT 50 OFFSET %s", (page * 50,))
+            await cursor.execute("SELECT * FROM peers ORDER BY online DESC, session_start ASC, last_seen DESC LIMIT 50 OFFSET %s", (page * 50,))
             peers = await cursor.fetchall()
             await cursor.execute("SELECT COUNT(*) FROM peers")
             total_pages = await cursor.fetchone()
