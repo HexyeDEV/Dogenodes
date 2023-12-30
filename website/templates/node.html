@@ -68,14 +68,14 @@
         type: 'bar',
         data: {
             labels: [
-                {% for data in history %}
+                {% for data in history|reverse %}
                 '{{ data.timestamp|date }}',
                 {% endfor %}
             ],
             datasets: [{
                 label: 'Uptime',
                 data: [
-                    {% for data in history %}
+                    {% for data in history|reverse %}
                     {{ data.online }},
                     {% endfor %}
                 ],
