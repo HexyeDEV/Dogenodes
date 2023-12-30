@@ -195,4 +195,4 @@ async def get_peer_uptime_percentage(peer_id: int, amount: int, period_unit: str
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app)
+    uvicorn.run(app, host="0.0.0.0")
