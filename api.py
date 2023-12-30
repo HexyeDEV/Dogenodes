@@ -57,7 +57,7 @@ def jsonify_versions_history(versions_history, pages):
     }, {"pages": int(pages)}
 
 async def get_uptime(peer_id):
-    async with app.db.acquire() as conn:
+    async with app.db_connection.acquire() as conn:
         async with conn.cursor() as cursor:
             await cursor.execute("SELECT * FROM peers WHERE id=%s", (peer_id,))
             session_start = await cursor.fetchone()
