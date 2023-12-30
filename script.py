@@ -1,11 +1,20 @@
 import requests, json
-import sqlite3
+import mysql.connector
 import time
 from db import create_db
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 create_db()
 
-conn = sqlite3.connect("db.db")
+conn = mysql.connector.connect(
+    host=os.getenv('DB_HOST'),
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASS'),
+    database=os.getenv('DB_NAME')
+)
 
 
 RELAY_NODES = [
@@ -54,17 +63,17 @@ def is_valid(peer):
 
 def get_peer_from_db(ip, port):
     c = conn.cursor()
-    c.execute("SELECT * FROM peers WHERE ip=? AND port=?", (ip, port))
+    c.execute("SELECT * FROM peers WHERE ip=%s AND port=%s", (ip, port))
     return c.fetchone()
 
 def update_peer_history(peer, online, timestamp):
     c = conn.cursor()
-    c.execute("INSERT INTO peer_history (peer_id, online, timestamp) VALUES (?, ?, ?)", (peer[0], online, timestamp))
+    c.execute("INSERT INTO peer_history (peer_id, online, timestamp) VALUES (%s, %s, %s)", (peer[0], online, timestamp))
     conn.commit()
 
 def update_versions_history(version, sub_version, timestamp):
     c = conn.cursor()
-    c.execute("INSERT INTO versions_history (version, sub_version, timestamp) VALUES (?, ?, ?)", (version, sub_version, timestamp))
+    c.execute("INSERT INTO versions_history (version, sub_version, timestamp) VALUES (%s, %s, %s)", (version, sub_version, timestamp))
     conn.commit()
 
 def get_relay_version(relay):
@@ -104,11 +113,11 @@ def update_all_data():
                 continue
         if get_peer_from_db(ip, port) is None:
             c = conn.cursor()
-            c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (ip, port, 1, timestamp, timestamp, timestamp, version, sub_version, 0))
+            c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (ip, port, 1, timestamp, timestamp, timestamp, version, sub_version, 0))
             conn.commit()
         else:
             c = conn.cursor()
-            c.execute("UPDATE peers SET online=?, last_seen=?, last_check=? WHERE ip=? AND port=?", (1, timestamp, timestamp, ip, port))
+            c.execute("UPDATE peers SET online=%s, last_seen=%s, last_check=%s WHERE ip=%s AND port=%s", (1, timestamp, timestamp, ip, port))
             conn.commit()
         update_peer_history(get_peer_from_db(ip, port), 1, timestamp)
         update_versions_history(version, sub_version, timestamp)
