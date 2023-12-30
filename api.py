@@ -10,7 +10,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
-    app.db_connection = await aiomysql.create_pool(host=os.getenv("DB_HOST"), port=int(os.getenv("DB_PORT")), user=os.getenv("DB_USER"), password=os.getenv("DB_PASSWORD"), db=os.getenv("DB_NAME"), autocommit=True)
+    app.db_connection = await aiomysql.create_pool(host=os.getenv("DB_HOST"), user=os.getenv("DB_USER"), password=os.getenv("DB_PASS"), db=os.getenv("DB_NAME"), autocommit=True)
 
 @app.on_event("shutdown")
 async def shutdown():
