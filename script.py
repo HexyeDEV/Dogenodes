@@ -100,9 +100,13 @@ def update_all_data():
         else:
             ip = peer["addr"].split(":")[0]
             port = peer["addr"].split(":")[1]
+        stop = False
         for relay in RELAY_NODES:
             if ip in relay[0]:
-                continue
+                stop = True
+                break
+        if stop:
+            continue
         if not is_valid(peer):
             c = conn.cursor()
             c.execute("UPDATE peers SET online=%s, last_check=%s WHERE ip=%s AND port=%s", (0, timestamp, peer["addr"].split(":")[0], peer["addr"].split(":")[1]))
