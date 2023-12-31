@@ -92,7 +92,12 @@ def node(id):
 
 @app.route("/nodes/ip/<host>")
 def node_by_ip(host):
-    ip, port = host.split("-")
+    if "]" in host:
+        port = host.split("]-")[1]
+        ip = host.split("]-")[0] + "]"
+        ip = ip.replace("-", ":")
+    else:
+        ip, port = host.split("-")
     print(host)
     print(ip, port)
     peer = requests.get(f"{API_URL}/peer/get/{ip}/{port}").json()
