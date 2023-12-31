@@ -98,7 +98,13 @@ def update_all_data():
             c = conn.cursor()
             c.execute("UPDATE peers SET online=%s, last_check=%s WHERE ip=%s AND port=%s", (0, timestamp, peer["addr"].split(":")[0], peer["addr"].split(":")[1]))
             conn.commit()
-            update_peer_history(get_peer_from_db(peer["addr"].split(":")[0], peer["addr"].split(":")[1]), 0, timestamp)
+            if peer["addr"].startswith("["):
+                ip = peer["addr"].split("]:")[0] + "]"
+                port = peer["addr"].split("]:")[1]
+            else:
+                ip = peer["addr"].split(":")[0]
+                port = peer["addr"].split(":")[1]
+            update_peer_history(get_peer_from_db(ip, port), 0, timestamp)
             continue
         version = peer["version"]
         sub_version = peer["subver"]
