@@ -50,6 +50,8 @@ def versions():
     sub_versions = {}
     for page in peers:
         for peer in page:
+            if peer["online"] == 0:
+                continue
             try:
                 peer["version"] = int(peer["version"])
             except:
