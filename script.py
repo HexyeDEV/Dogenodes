@@ -94,20 +94,6 @@ def update_all_data():
     peers = get_peers()
     timestamp = int(time.time())
     for peer in peers:
-        if not is_valid(peer):
-            c = conn.cursor()
-            c.execute("UPDATE peers SET online=%s, last_check=%s WHERE ip=%s AND port=%s", (0, timestamp, peer["addr"].split(":")[0], peer["addr"].split(":")[1]))
-            conn.commit()
-            if peer["addr"].startswith("["):
-                ip = peer["addr"].split("]:")[0] + "]"
-                port = peer["addr"].split("]:")[1]
-            else:
-                ip = peer["addr"].split(":")[0]
-                port = peer["addr"].split(":")[1]
-            update_peer_history(get_peer_from_db(ip, port), 0, timestamp)
-            continue
-        version = peer["version"]
-        sub_version = peer["subver"]
         if peer["addr"].startswith("["):
             ip = peer["addr"].split("]:")[0] + "]"
             port = peer["addr"].split("]:")[1]
@@ -117,6 +103,14 @@ def update_all_data():
         for relay in RELAY_NODES:
             if ip in relay[0]:
                 continue
+        if not is_valid(peer):
+            c = conn.cursor()
+            c.execute("UPDATE peers SET online=%s, last_check=%s WHERE ip=%s AND port=%s", (0, timestamp, peer["addr"].split(":")[0], peer["addr"].split(":")[1]))
+            conn.commit()
+            update_peer_history(get_peer_from_db(ip, port), 0, timestamp)
+            continue
+        version = peer["version"]
+        sub_version = peer["subver"]
         if get_peer_from_db(ip, port) is None:
             c = conn.cursor()
             c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (ip, port, 1, timestamp, timestamp, timestamp, version, sub_version, 0))
@@ -148,8 +142,8 @@ def update_all_data():
             ip = relay[0].split(":")[0]
             port = relay[0].split(":")[1]
         version, sub_version = get_relay_version(relay)
+        actual_port = relay[3]
         if is_relay_online(relay):
-            actual_port = relay[3]
             if get_peer_from_db(ip, actual_port) is None:
                 c = conn.cursor()
                 c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (ip, actual_port, 1, timestamp, timestamp, timestamp, version, sub_version, 1))
@@ -162,9 +156,9 @@ def update_all_data():
             update_versions_history(version, sub_version, timestamp)
         else:
             c = conn.cursor()
-            c.execute("UPDATE peers SET online=%s, last_check=%s, session_start=%s WHERE ip=%s AND port=%s", (0, timestamp, 0, ip, port))
+            c.execute("UPDATE peers SET online=%s, last_check=%s, session_start=%s WHERE ip=%s AND port=%s", (0, timestamp, 0, ip, actual_port))
             conn.commit()
-            update_peer_history(get_peer_from_db(ip, port), 0, timestamp)
+            update_peer_history(get_peer_from_db(ip, actual_port), 0, timestamp)
 
 if __name__ == "__main__":
     try:
