@@ -41,12 +41,59 @@
             display: inline-block;
             width: fit-content;
         }
+
+        .ad-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .ad-left {
+            float: left;
+        }
+
+        .ad-right {
+            float: right;
+        }
     </style>
+
+    <script>
+        function parse_ads() {
+            screen_width = window.innerWidth;
+            if (screen_width < 800) {
+                url = "https://zerads.com/ad/ad.php?width=300&ref=3892"
+                width = 300;
+                height = 250;
+                ad_left = document.getElementsByClassName("ad-left")[0];
+                ad_left.innerHTML = "<iframe src=\"" + url + "\" marginwidth=\"0\" marginheight=\"0\" width=\"" + width + "\" height=\"" + height + "\" scrolling=\"no\" border=\"0\" frameborder=\"0\"></iframe>";
+            } else {
+                url = "https://zerads.com/ad/ad.php?width=468&ref=3892"
+                width = 468;
+                height = 60;
+                ad_left = document.getElementsByClassName("ad-left")[0];
+                ad_left.innerHTML = "<iframe src=\"" + url + "\" marginwidth=\"0\" marginheight=\"0\" width=\"" + width + "\" height=\"" + height + "\" scrolling=\"no\" border=\"0\" frameborder=\"0\"></iframe>";
+                ad_right = document.getElementsByClassName("ad-right")[0];
+                ad_right.innerHTML = "<iframe src=\"" + url + "\" marginwidth=\"0\" marginheight=\"0\" width=\"" + width + "\" height=\"" + height + "\" scrolling=\"no\" border=\"0\" frameborder=\"0\"></iframe>";
+            }
+        }
+    </script>
     {% block head %}
     {% endblock %}
 </head>
-<body>
+<body onload="parse_ads()">
     <h1 class="text-center">DOGENODES</h1>
+    <br>
+    <div class="ad-container">
+        <div class="ad-left">
+        </div>
+        <div class="ad-right">
+        </div>
+    </div>
+    <br>
     <div class="container">
         {% block content %}
         {% endblock %}
@@ -66,6 +113,8 @@
         <br>
         ETH: 0x160f21Ae7cFF2580f90e6b2B78B8cC4dE628bED2
         </p>
+        <br>
+        <p><a href="https://zerads.com/index.php?view=site&id=3892" target="_blank" >Advertise Here</a></p>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
