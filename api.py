@@ -21,7 +21,10 @@ def jsonify_peer(peer):
     if peer[9] == 1:
         bytes_sent_per_msg = {"No data for relay nodes": 0}
     else:
-        bytes_sent_per_msg = json.loads(peer[10])
+        try:
+            bytes_sent_per_msg = json.loads(peer[10])
+        except:
+            bytes_sent_per_msg = {"No data for this peer": 0}
 
     return {
         "id": peer[0],
