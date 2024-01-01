@@ -118,13 +118,14 @@ def update_all_data():
             continue
         version = peer["version"]
         sub_version = peer["subver"]
+        bytes_sent_per_msg = peer["bytessent_per_msg"]
         if get_peer_from_db(ip, port) is None:
             c = conn.cursor()
-            c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (ip, port, 1, timestamp, timestamp, timestamp, version, sub_version, 0))
+            c.execute("INSERT INTO peers (ip, port, online, last_seen, session_start, last_check, version, sub_version, is_relay, bytes_sent_per_msg) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (ip, port, 1, timestamp, timestamp, timestamp, version, sub_version, 0, json.dumps(bytes_sent_per_msg)))
             conn.commit()
         else:
             c = conn.cursor()
-            c.execute("UPDATE peers SET online=%s, last_seen=%s, last_check=%s WHERE ip=%s AND port=%s", (1, timestamp, timestamp, ip, port))
+            c.execute("UPDATE peers SET online=%s, last_seen=%s, last_check=%s, bytes_sent_per_msg=%s WHERE ip=%s AND port=%s", (1, timestamp, timestamp, json.dumps(bytes_sent_per_msg), ip, port))
             conn.commit()
         update_peer_history(get_peer_from_db(ip, port), 1, timestamp)
         update_versions_history(version, sub_version, timestamp)

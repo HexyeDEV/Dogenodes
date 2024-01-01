@@ -26,6 +26,12 @@ def reverse_filter(s):
 def round_filter(s, n):
     return round(s, n)
 
+@app.template_filter('percentage')
+def percentage_filter(s, total):
+    if total == 0 or s == 0:
+        return 0
+    return round(s / total * 100, 2)
+
 @app.route("/")
 def index():
     online_nodes = requests.get(f"{API_URL}/nodes/online").json()
@@ -81,6 +87,9 @@ def nodes():
 def node(id):
     print(id)
     peer = requests.get(f"{API_URL}/peer/get/{id}/").json()
+    bytes_sent_per_msg_total = 0
+    for key in peer["peer"]["bytes_sent_per_msg"]:
+        bytes_sent_per_msg_total += peer["peer"]["bytes_sent_per_msg"][key]
     peer_history = requests.get(f"{API_URL}/peer/{id}/history?page=0").json()
     average_24h, average_7d, average_30d, average_365d = None, None, None, None
     average_1h = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/1/hour").json()["percentage"]
@@ -88,7 +97,7 @@ def node(id):
     average_7d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/7/day").json()["percentage"]
     average_30d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/30/day").json()["percentage"]
     average_365d = requests.get(f"{API_URL}/peer/{id}/uptime/percentage/365/day").json()["percentage"]
-    return render_template("node.html", node=peer["peer"], node_uptime=peer["uptime"], history=peer_history[0], average_1h=average_1h, average_24h=average_24h, average_7d=average_7d, average_30d=average_30d, average_365d=average_365d)
+    return render_template("node.html", node=peer["peer"], node_uptime=peer["uptime"], history=peer_history[0], average_1h=average_1h, average_24h=average_24h, average_7d=average_7d, average_30d=average_30d, average_365d=average_365d, bytes_sent_per_msg_total=bytes_sent_per_msg_total)
 
 @app.route("/nodes/ip/<host>")
 def node_by_ip(host):

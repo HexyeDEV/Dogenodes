@@ -54,6 +54,23 @@
 
     </div>
 </div>
+<br>
+<div class="answer-question">
+    <div class="question">
+        <h3>Bytes sent per Message</h3>
+    </div>
+
+    <div class="answer">
+        <p>
+            Total Bytes Sent: {{ bytes_sent_per_msg_total }}
+            <br>
+            {% for type in node.bytes_sent_per_msg %}
+                {{ type }}: {{ node.bytes_sent_per_msg[type] }} ({{node.bytes_sent_per_msg[type]|percentage(bytes_sent_per_msg_total)}}%)
+                <br>
+            {% endfor %}
+        </p>
+    </div>
+</div>
 
 <!-- graph with uptime -->
 <br>

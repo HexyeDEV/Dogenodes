@@ -2,7 +2,7 @@ from fastapi import FastAPI, Query
 import aiomysql
 import uvicorn, time
 from dotenv import load_dotenv
-import os
+import os, json
 
 load_dotenv()
 
@@ -18,6 +18,11 @@ async def shutdown():
     await app.db_connection.wait_closed()
 
 def jsonify_peer(peer):
+    if peer[9] == 1:
+        bytes_sent_per_msg = {"No data for relay nodes": 0}
+    else:
+        bytes_sent_per_msg = json.loads(peer[10])
+
     return {
         "id": peer[0],
         "ip": peer[1],
@@ -28,6 +33,7 @@ def jsonify_peer(peer):
         "last_check": peer[6],
         "version": peer[7],
         "sub_version": peer[8],
+        "bytes_sent_per_msg": bytes_sent_per_msg,
     }
 
 async def jsonify_peers(peers, pages):

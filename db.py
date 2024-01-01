@@ -22,7 +22,8 @@ def create_db():
         last_check INTEGER DEFAULT 0,
         version TEXT,
         sub_version TEXT,
-        is_relay INTEGER DEFAULT 0);""")
+        is_relay INTEGER DEFAULT 0,
+        bytes_sent_per_msg TEXT);""")
     c.execute("""CREATE TABLE IF NOT EXISTS peer_history (
         id INTEGER PRIMARY KEY AUTO_INCREMENT,
         peer_id INTEGER,
